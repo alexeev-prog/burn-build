@@ -1,0 +1,14 @@
+{
+	"metadata": {
+		"name": "Example",
+		"version": "0.1.0",
+		"description": "Hello World app",
+		"language": "cpp"
+	},
+
+	"compiler": {
+		"name": "g++",
+		"base_compiler_flags": ["-Wall"],
+		"linker_flags": []
+	}
+}

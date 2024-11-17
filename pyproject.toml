@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "pyburn-build"
+version = "0.1.4"
+description = "build system written in python for projects in C, C++, Python, ASM"
+authors = ["alexeev-prog <alexeev.dev@mail.ru>"]
+license = "GNU LGPL v2.1"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pytoml = "^0.1.21"
+PyYAML = "^6.0.2"
+click = "^8.1.7"
+rich = "^13.9.4"
+configparser = "^7.1.0"
+loguru = "^0.7.2"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.7.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

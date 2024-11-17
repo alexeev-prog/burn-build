@@ -1,0 +1,18 @@
+prelude_commands = []
+post_commands = []
+
+[targets]
+
+[targets.target1]
+dependencies = []
+compiler_options = ["-O2", "-Wall", "-pedantic"]
+sources = ["src/main.c"]
+output = "out/target1.out"
+objects = ["out/main.o"]
+
+[targets.target2]
+dependencies = []
+compiler_options = ["-O2", "-Wall", "-pedantic"]
+sources = ["src/main2.c"]
+output = "out/target2.out"
+objects = ["out/main2.o"]

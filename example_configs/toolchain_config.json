@@ -1,0 +1,21 @@
+{
+	"prelude_commands": [],
+	"targets": {
+		"target1": {
+			"dependencies": [],
+			"compiler_options": ["-O2", "-pedantic"],
+			"sources": ["src/main.c"],
+			"output": "out/target1.out",
+			"objects": [],
+			"compiler": "gcc"
+		},
+		"target2": {
+			"dependencies": [],
+			"compiler_options": ["-O3", "-pedantic"],
+			"sources": ["src/main2.cpp"],
+			"output": "out/target2.out",
+			"objects": []
+		}
+	},
+	"post_commands": []
+}
