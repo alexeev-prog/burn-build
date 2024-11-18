@@ -27,32 +27,13 @@ class BaseBuilder:
 		self.compiler_name = compiler_name
 		self.target = target
 		self.includes = (
-			"-I./".join(self.target.includes) if len(self.target.includes) > 0 else ""
+			"-I" + "".join(self.target.includes)
+			if len(self.target.includes) > 0
+			else ""
 		)
 		self.sources = " ".join(self.target.sources)
 		self.flags = f"{' '.join(self.project_config.BASE_COMPILER_FLAGS)} {' '.join(self.target.compiler_options)}"
 		self.command = f"{self.compiler_name} {self.flags} {self.includes} {self.sources} -o {self.target.output}"
-
-	def execute_commands(self, commands: list):
-		"""
-		Execute commands
-
-		:param		commands:	   The commands
-		:type		commands:	   list
-
-		:raises		RuntimeError:  command failed
-		"""
-		for command in commands:
-			logger.info(f"Execute command: {command}")
-			result = subprocess.run(
-				shlex.split(command), stdout=subprocess.PIPE, stderr=subprocess.PIPE
-			)
-			if result.returncode != 0:
-				raise RuntimeError(
-					f'Command "{command}" failed with exit code {result.returncode}: {result.stderr.decode()}'
-				)
-			else:
-				logger.info(f'Successfully run "{command}": {result.stdout.decode()}')
 
 	def run(self):
 		"""
@@ -61,11 +42,11 @@ class BaseBuilder:
 		:raises		RuntimeError:  command failed
 		"""
 		result = subprocess.run(
-				shlex.split(self.command), stdout=subprocess.PIPE, stderr=subprocess.PIPE
-			)
+			shlex.split(self.command), stdout=subprocess.PIPE, stderr=subprocess.PIPE
+		)
 		if result.returncode != 0:
 			raise RuntimeError(
-				f'Command "{self.command}" failed with exit code {result.returncode}: {result.stderr.decode()}'
+				f'Command "{self.command}" failed with exit code {result.returncode}:\n{result.stderr.decode()}'
 			)
 		else:
 			logger.info(f'Successfully run "{self.command}": {result.stdout.decode()}')

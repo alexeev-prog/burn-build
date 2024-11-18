@@ -2,18 +2,14 @@
 
 <div align="center">  
   <p align="center">
-	build system written in python for projects in C, C++, Python, ASM
+	build system written in python for projects in C and C++
 	<br />
 	<a href="./docs/index.md"><strong>Explore the docs »</strong></a>
 	<br />
 	<br />
-	<a href="#-key-features">Key Features</a>
-	·
 	<a href="#-getting-started">Getting Started</a>
 	·
 	<a href="#-usage-examples">Basic Usage</a>
-	·
-	<a href="#-specifications">Specification</a>
 	·
 	<a href="https://github.com/alexeev-prog/burn-build/blob/main/LICENSE">License</a>
   </p>
@@ -46,13 +42,13 @@ Create project_config.json:
 		"name": "Example",
 		"version": "0.1.0",
 		"description": "Hello World app",
-		"language": "cpp"
+		"language": "cpp",
+		"use_cmake": true
 	},
 
 	"compiler": {
 		"name": "g++",
-		"base_compiler_flags": ["-Wall"],
-		"linker_flags": []
+		"base_compiler_flags": ["-Wall"]
 	}
 }
 ```
@@ -64,7 +60,6 @@ Create toolchain_config.json:
 	"prelude_commands": [],
 	"targets": {
 		"target1": {
-			"dependencies": [],
 			"compiler_options": ["-O2", "-pedantic"],
 			"sources": ["src/main.c"],
 			"output": "out/target1.out",
@@ -72,7 +67,6 @@ Create toolchain_config.json:
 			"compiler": "gcc"
 		},
 		"target2": {
-			"dependencies": [],
 			"compiler_options": ["-O3", "-pedantic"],
 			"sources": ["src/main2.cpp"],
 			"output": "out/target2.out",

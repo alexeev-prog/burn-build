@@ -3,10 +3,9 @@ metadata:
     version: 0.1.0
     description: build system written in python for projects in C, C++, Python, ASM
     language: python
+    use_cmake: true
 
 compiler:
     name: gcc
     base_compiler_flags:
         - "-c"
-    linker_flags:
-        - "-03"

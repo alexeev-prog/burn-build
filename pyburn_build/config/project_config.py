@@ -15,7 +15,8 @@ class ProjectConfig:
 
 	COMPILER_NAME: str = None
 	BASE_COMPILER_FLAGS: list = field(default_factory=list)
-	COMPILER_LINKER_FLAGS: list = field(default_factory=list)
+
+	USE_CMAKE: bool = False
 
 	EXTRA: dict = field(default_factory=dict)
 
@@ -62,9 +63,10 @@ class ProjectConfigReader(ConfigReader):
 			NAME=metadata.get("name", "myApp"),
 			VERSION=metadata.get("version", "0.1.0"),
 			DESCRIPTION=metadata.get("description", "my application"),
+			LANGUAGE=metadata.get("language", "DEFAULT"),
+			USE_CMAKE=metadata.get("use_cmake", False),
 			COMPILER_NAME=compiler.get("name", None),
 			BASE_COMPILER_FLAGS=compiler.get("base_compiler_flags", []),
-			COMPILER_LINKER_FLAGS=compiler.get("linker_flags", []),
 		)
 
 		return config

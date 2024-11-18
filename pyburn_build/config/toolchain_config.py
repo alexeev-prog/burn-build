@@ -11,7 +11,6 @@ class TargetData:
 
 	name: str
 	output: str
-	dependencies: list = field(default_factory=list)
 	includes: list = field(default_factory=list)
 	sources: list = field(default_factory=list)
 	compiler: str = None
@@ -65,7 +64,6 @@ class ToolchainConfigReader(ConfigReader):
 				TargetData(
 					name=target_name,
 					output=target.get("output", "bin/a.out"),
-					dependencies=target.get("dependencies", []),
 					compiler_options=target.get("compiler_options", []),
 					sources=target.get("sources", []),
 					includes=target.get("includes", []),

@@ -1,5 +1,8 @@
 from pathlib import Path
 import re
+import subprocess
+import shlex
+from loguru import logger
 
 
 def validate_project_name(project_name: str):
@@ -25,3 +28,25 @@ def create_directory(path: Path):
 	:type		path:  Path
 	"""
 	Path(path).mkdir(parents=True, exist_ok=True)
+
+
+def execute_commands(commands: list):
+	"""
+	Execute commands
+
+	:param		commands:	   The commands
+	:type		commands:	   list
+
+	:raises		RuntimeError:  command failed
+	"""
+	for command in commands:
+		logger.info(f"Execute command: {command}")
+		result = subprocess.run(
+			shlex.split(command), stdout=subprocess.PIPE, stderr=subprocess.PIPE
+		)
+		if result.returncode != 0:
+			raise RuntimeError(
+				f'Command "{command}" failed with exit code {result.returncode}:\n{result.stderr.decode()}'
+			)
+		else:
+			logger.info(f'Successfully run "{command}": {result.stdout.decode()}')

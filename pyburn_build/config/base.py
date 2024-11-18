@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from enum import Enum
 import yaml
-import pytoml as toml
+import toml
 
 
 class ConfigType(Enum):
@@ -46,6 +46,6 @@ class ConfigReader:
 			elif self.configtype == ConfigType.TOML:
 				data = toml.load(fh)
 			elif self.configtype == ConfigType.JSON:
-				data = json.load(fh)
+				data = json.loads(fh)
 
 		return data

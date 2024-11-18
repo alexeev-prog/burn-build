@@ -3,12 +3,12 @@
 		"name": "Example",
 		"version": "0.1.0",
 		"description": "Hello World app",
-		"language": "cpp"
+		"language": "cpp",
+		"use_cmake": true
 	},
 
 	"compiler": {
 		"name": "g++",
-		"base_compiler_flags": ["-Wall"],
-		"linker_flags": []
+		"base_compiler_flags": ["-Wall"]
 	}
 }

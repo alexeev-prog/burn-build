@@ -87,7 +87,11 @@ class ProjectArchitecture:
 		for file in self.files:
 			logger.debug(f"Create file: {file}")
 			with open(os.path.join(self.base_dir, file), "w") as f:
-				f.write(TEMPLATES.get(file, file))
+				f.write(
+					TEMPLATES.get(file, file)
+					.replace("%{PROJECT_NAME}", self.project_config.NAME)
+					.replace("%{PROJECT_VERSION}", self.project_config.VERSION)
+				)
 
 		for file in self.added_files:
 			logger.debug(f"Create file: {file}")
