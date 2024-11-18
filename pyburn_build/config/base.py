@@ -44,8 +44,8 @@ class ConfigReader:
 			if self.configtype == ConfigType.YAML:
 				data = yaml.load(fh, Loader=yaml.FullLoader)
 			elif self.configtype == ConfigType.TOML:
-				data = toml.load(fh)
+				data = toml.loads(fh)
 			elif self.configtype == ConfigType.JSON:
-				data = json.loads(fh)
+				data = json.load(fh)
 
 		return data
