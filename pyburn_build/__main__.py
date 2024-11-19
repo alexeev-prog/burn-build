@@ -1,14 +1,14 @@
 import click
 from rich.console import Console
 from rich.prompt import Prompt, Confirm
-from loguru import logger
 from pyburn_build.config.base import ConfigType
 from pyburn_build.config.project_config import ProjectConfigReader
 from pyburn_build.config.toolchain_config import ToolchainConfigReader
 from pyburn_build.creator import ProjectArchitecture
 from pyburn_build.builders.build_manager import BuildManager
-from pyburn_build.utils import execute_commands
+from pyburn_build.utils import CommandManager
 from pyburn_build.config.configsaver import write_file
+from pyburn_build.exceptions import UnknownTargetError
 
 console = Console()
 
@@ -34,7 +34,7 @@ def config_type_by_file(filename: str) -> ConfigType:
 @click.group()
 def cli():
 	"""
-	Software for quickly creating C++ projects
+	Software for quickly creating and building C/C++ projects
 	"""
 	pass
 
@@ -62,6 +62,7 @@ def add_project_config(output_type: str, output_file: str):
 	compiler_name = Prompt.ask("Default compiler name")
 	base_compiler_flags = Prompt.ask("Base compiler flags", default="").split(" ")
 	use_cmake = Confirm.ask("Use CMake", default=False)
+	cache_file = Prompt.ask("Cache file (.json)", default="cache_data.json")
 
 	config = {
 		"metadata": {
@@ -70,6 +71,7 @@ def add_project_config(output_type: str, output_file: str):
 			"description": description,
 			"language": language,
 			"use_cmake": use_cmake,
+			"cache_file": cache_file,
 		},
 		"compiler": {"name": compiler_name, "base_compiler_flags": base_compiler_flags},
 	}
@@ -97,8 +99,12 @@ def create(project_config: str, toolchain_config: str):
 	pc = ProjectConfigReader(project_config, project_config_type)
 	tc = ToolchainConfigReader(toolchain_config, toolchain_config_type)
 
-	logger.info(f'Load project configuration "{project_config}" successfully.')
-	logger.info(f'Load toolchain configuration "{toolchain_config}" successfully')
+	console.print(
+		f'[green]Load project configuration "{project_config}" successfully.[/green]'
+	)
+	console.print(
+		f'[green]Load toolchain configuration "{toolchain_config}" successfully[/green]'
+	)
 
 	pa = ProjectArchitecture(pc.config, tc.config)
 	pa.add_file(project_config)
@@ -135,29 +141,6 @@ def build(targets: str, project_config: str, toolchain_config: str):
 
 
 @cli.command()
-@click.argument("project_config")
-def show_project_config(project_config: str):
-	"""
-	Shows the project configuration.
-
-	:param		project_config:	 The project configuration
-	:type		project_config:	 str
-	"""
-	project_config_type = config_type_by_file(project_config)
-	pc = ProjectConfigReader(project_config, project_config_type)
-
-	console.print(f'{"=" * 30} Metadata {"=" * 30}')
-	console.print(f"Project Name: {pc.config.NAME}")
-	console.print(f"Project Version: {pc.config.VERSION}")
-	console.print(f"Project Main Language: {pc.config.LANGUAGE}")
-	console.print(f'{"=" * 30} Compiler {"=" * 30}')
-	console.print(f"Compiler Name: {pc.config.COMPILER_NAME}")
-	console.print(f"Base Compiler Flags: {pc.config.BASE_COMPILER_FLAGS}")
-	console.print(f"Use CMAKE (flag): {pc.config.USE_CMAKE}")
-	console.print(f"\nExtra: {pc.config.EXTRA}")
-
-
-@cli.command()
 @click.option("--toolchain-config", help="Path to toolchain config", required=True)
 @click.option("--target", help="Target name", required=True)
 def run(toolchain_config: str, target: str):
@@ -181,66 +164,9 @@ def run(toolchain_config: str, target: str):
 			break
 
 	if isinstance(target, str):
-		raise ValueError(f"Unknown target: {target}")
+		raise UnknownTargetError(f"Unknown target: {target}")
 
-	execute_commands([f"./{target.output}"])
-
-
-@cli.command()
-@click.argument("toolchain_config")
-def show_toolchain_config(toolchain_config: str):
-	"""
-	Shows the toolchain configuration.
-
-	:param		toolchain_config:  The toolchain configuration
-	:type		toolchain_config:  str
-	"""
-	toolchain_config_type = config_type_by_file(toolchain_config)
-	tc = ToolchainConfigReader(toolchain_config, toolchain_config_type)
-
-	console.print(f"Prelude Commands: {tc.config.prelude_commands}")
-	console.print(f"Post commands: {tc.config.post_commands}")
-
-	for target in tc.config.targets:
-		console.print(f'{"=" * 30} Target {target.name} {"=" * 30}')
-		console.print(f"Sources: {target.sources}")
-		console.print(f"Includes: {target.includes}")
-		console.print(f"Output: {target.output}")
-		console.print(f"Compiler options: {target.compiler_options}")
-
-
-@cli.command()
-@click.option("--project-config", help="Path to project config", required=True)
-@click.option("--toolchain-config", help="Path to toolchain config", required=True)
-def show_configs(project_config: str, toolchain_config: str):
-	project_config_type = config_type_by_file(project_config)
-	pc = ProjectConfigReader(project_config, project_config_type)
-
-	console.print(f'{"=" * 50} PROJECT {"=" * 50}')
-
-	console.print(f'{"=" * 30} Metadata {"=" * 30}')
-	console.print(f"Project Name: {pc.config.NAME}")
-	console.print(f"Project Version: {pc.config.VERSION}")
-	console.print(f"Project Main Language: {pc.config.LANGUAGE}")
-	console.print(f'{"=" * 30} Compiler {"=" * 30}')
-	console.print(f"Compiler Name: {pc.config.COMPILER_NAME}")
-	console.print(f"Base Compiler Flags: {pc.config.BASE_COMPILER_FLAGS}")
-	console.print(f"\nExtra: {pc.config.EXTRA}")
-
-	toolchain_config_type = config_type_by_file(toolchain_config)
-	tc = ToolchainConfigReader(toolchain_config, toolchain_config_type)
-
-	console.print(f'{"=" * 50} TOOLCHAIN {"=" * 50}')
-
-	console.print(f"Prelude Commands: {tc.config.prelude_commands}")
-	console.print(f"Post commands: {tc.config.post_commands}")
-
-	for target in tc.config.targets:
-		console.print(f'{"=" * 30} Target {target.name} {"=" * 30}')
-		console.print(f"Sources: {target.sources}")
-		console.print(f"Includes: {target.includes}")
-		console.print(f"Output: {target.output}")
-		console.print(f"Compiler options: {target.compiler_options}")
+	CommandManager.run_command(f"./{target.output}")
 
 
 def main():

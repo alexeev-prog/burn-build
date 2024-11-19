@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from loguru import logger
+from rich import print
 from pyburn_build.config.project_config import ProjectConfig
 from pyburn_build.config.toolchain_config import ToolchainConfig
 from pyburn_build.templates import TEMPLATES
@@ -85,7 +85,7 @@ class ProjectArchitecture:
 		Creates files.
 		"""
 		for file in self.files:
-			logger.debug(f"Create file: {file}")
+			print(f"[bold cyan][CREATOR][/bold cyan] Create file: {file}")
 			with open(os.path.join(self.base_dir, file), "w") as f:
 				f.write(
 					TEMPLATES.get(file, file)
@@ -94,7 +94,7 @@ class ProjectArchitecture:
 				)
 
 		for file in self.added_files:
-			logger.debug(f"Create file: {file}")
+			print(f"[bold cyan][CREATOR][/bold cyan] Create file: {file}")
 			with open(file, "r") as src:
 				file = file.split("/")[-1]
 				with open(os.path.join(self.base_dir, file), "w") as dist:
@@ -104,23 +104,23 @@ class ProjectArchitecture:
 		"""
 		Creates dirs.
 		"""
-		logger.debug(f"Create directory: {self.base_dir}")
+		print(f"[bold cyan][CREATOR][/bold cyan] Create directory: {self.base_dir}")
 		create_directory(self.base_dir)
-		logger.debug(f"Create directory: {self.docs_dir}")
+		print(f"[bold cyan][CREATOR][/bold cyan] Create directory: {self.docs_dir}")
 		create_directory(self.docs_dir)
 
 		for extra_dir in self.extra_dirs:
-			logger.debug(f"Create directory: {extra_dir}")
+			print(f"[bold cyan][CREATOR][/bold cyan] Create directory: {extra_dir}")
 			create_directory(extra_dir)
 
 	def run(self):
 		"""
 		Run project creation
 		"""
-		logger.info("Project creation runned...")
+		print(f'[bold green][CREATOR][/bold green] {"=" * 16} Run Project Creation')
 
 		self._create_dirs()
 
 		self._create_files()
 
-		logger.info("Project created successfully!")
+		print(f'[bold green][CREATOR][/bold green] {"=" * 16} End Project Creation')

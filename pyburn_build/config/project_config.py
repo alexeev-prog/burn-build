@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from pyburn_build.config.base import ConfigReader, ConfigType
+from pyburn_build.exceptions import ProjectConfigError
 
 
 @dataclass
@@ -12,6 +13,7 @@ class ProjectConfig:
 	VERSION: str
 	DESCRIPTION: str
 	LANGUAGE: str = "DEFAULT"
+	CACHE_FILE: str = "build_cache.json"
 
 	COMPILER_NAME: str = None
 	BASE_COMPILER_FLAGS: list = field(default_factory=list)
@@ -51,11 +53,11 @@ class ProjectConfigReader(ConfigReader):
 		compiler = data.get("compiler", None)
 
 		if metadata is None:
-			raise ValueError(
+			raise ProjectConfigError(
 				"The project configuration must include metadata (name, version, description, language)"
 			)
-		elif metadata is None:
-			raise ValueError(
+		elif compiler is None:
+			raise ProjectConfigError(
 				"The project configuration must include compiler (name, base_compiler_flags, linker_flags)"
 			)
 
@@ -67,6 +69,7 @@ class ProjectConfigReader(ConfigReader):
 			USE_CMAKE=metadata.get("use_cmake", False),
 			COMPILER_NAME=compiler.get("name", None),
 			BASE_COMPILER_FLAGS=compiler.get("base_compiler_flags", []),
+			CACHE_FILE=metadata.get("cache_file", "build_cache.json"),
 		)
 
 		return config

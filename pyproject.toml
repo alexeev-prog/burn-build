@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyburn-build"
-version = "0.2.4"
+version = "0.3.4"
 description = "build system written in python for projects in C and C++"
 authors = ["alexeev-prog <alexeev.dev@mail.ru>"]
 license = "GNU LGPL v2.1"
@@ -14,6 +14,7 @@ rich = "^13.9.4"
 configparser = "^7.1.0"
 loguru = "^0.7.2"
 toml = "^0.10.2"
+requests = "^2.32.3"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.7.4"

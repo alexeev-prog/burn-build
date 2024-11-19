@@ -2,26 +2,26 @@
 
 <div align="center">  
   <p align="center">
-	build system written in python for projects in C and C++
-	<br />
-	<a href="./docs/index.md"><strong>Explore the docs »</strong></a>
-	<br />
-	<br />
-	<a href="#-getting-started">Getting Started</a>
-	·
-	<a href="#-usage-examples">Basic Usage</a>
-	·
-	<a href="https://github.com/alexeev-prog/burn-build/blob/main/LICENSE">License</a>
+    build system written in python for projects in C and C++
+    <br />
+    <a href="./docs/index.md"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="#-getting-started">Getting Started</a>
+    ·
+    <a href="#-usage-examples">Basic Usage</a>
+    ·
+    <a href="https://github.com/alexeev-prog/burn-build/blob/main/LICENSE">License</a>
   </p>
 </div>
 <br>
 <p align="center">
-	<img src="https://img.shields.io/github/languages/top/alexeev-prog/burn-build?style=for-the-badge">
-	<img src="https://img.shields.io/github/languages/count/alexeev-prog/burn-build?style=for-the-badge">
-	<img src="https://img.shields.io/github/license/alexeev-prog/burn-build?style=for-the-badge">
-	<img src="https://img.shields.io/github/stars/alexeev-prog/burn-build?style=for-the-badge">
-	<img src="https://img.shields.io/github/issues/alexeev-prog/burn-build?style=for-the-badge">
-	<img src="https://img.shields.io/github/last-commit/alexeev-prog/burn-build?style=for-the-badge">
+    <img src="https://img.shields.io/github/languages/top/alexeev-prog/burn-build?style=for-the-badge">
+    <img src="https://img.shields.io/github/languages/count/alexeev-prog/burn-build?style=for-the-badge">
+    <img src="https://img.shields.io/github/license/alexeev-prog/burn-build?style=for-the-badge">
+    <img src="https://img.shields.io/github/stars/alexeev-prog/burn-build?style=for-the-badge">
+    <img src="https://img.shields.io/github/issues/alexeev-prog/burn-build?style=for-the-badge">
+    <img src="https://img.shields.io/github/last-commit/alexeev-prog/burn-build?style=for-the-badge">
 </p>
 
 ## 🚀 Getting Started
@@ -38,18 +38,19 @@ Create project_config.json:
 
 ```json
 {
-	"metadata": {
-		"name": "Example",
-		"version": "0.1.0",
-		"description": "Hello World app",
-		"language": "cpp",
-		"use_cmake": true
-	},
+    "metadata": {
+        "name": "Example",
+        "version": "0.1.0",
+        "description": "Hello World app",
+        "language": "cpp",
+        "use_cmake": false,
+        "cache_file": "cache.json"
+    },
 
-	"compiler": {
-		"name": "g++",
-		"base_compiler_flags": ["-Wall"]
-	}
+    "compiler": {
+        "name": "g++",
+        "base_compiler_flags": ["-Wall"]
+    }
 }
 ```
 
@@ -57,23 +58,25 @@ Create toolchain_config.json:
 
 ```json
 {
-	"prelude_commands": [],
-	"targets": {
-		"target1": {
-			"compiler_options": ["-O2", "-pedantic"],
-			"sources": ["src/main.c"],
-			"output": "out/target1.out",
-			"objects": [],
-			"compiler": "gcc"
-		},
-		"target2": {
-			"compiler_options": ["-O3", "-pedantic"],
-			"sources": ["src/main2.cpp"],
-			"output": "out/target2.out",
-			"objects": []
-		}
-	},
-	"post_commands": []
+    "prelude_commands": [],
+    "targets": {
+        "target1": {
+            "compiler_options": ["-O2", "-pedantic"],
+            "sources": ["src/main.c"],
+            "output": "out/target1.out",
+            "includes": [],
+            "objects": [],
+            "compiler": "gcc"
+        },
+        "target2": {
+            "compiler_options": ["-O3", "-pedantic"],
+            "sources": ["src/main2.cpp"],
+            "output": "out/target2.out",
+            "includes": [],
+            "objects": []
+        }
+    },
+    "post_commands": []
 }
 ```
 

@@ -4,7 +4,8 @@
 		"version": "0.1.0",
 		"description": "Hello World app",
 		"language": "cpp",
-		"use_cmake": true
+		"use_cmake": false,
+		"cache_file": "cache.json"
 	},
 
 	"compiler": {
