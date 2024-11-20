@@ -47,7 +47,7 @@ class BaseBuilder:
 		for source in self.target.sources:
 			if self.cache.is_file_uptodate(source):
 				print(
-					f"[yellow]Source {source} finded in cache (skip building)[/yellow]"
+					f"[{self.target.name}] [yellow]Source {source} finded in cache (skip building)[/yellow]"
 				)
 				continue
 			else:

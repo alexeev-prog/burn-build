@@ -3,7 +3,34 @@ import re
 import os
 import subprocess
 import shlex
+from datetime import datetime
 from rich import print
+
+
+def get_current_datetime() -> str:
+	return datetime.now().strftime("%H:%M:%S")
+
+
+def print_header(msg_type: str, text: str):
+	print(
+		f'[yellow]{"#" * len(text)}[/yellow]\n[blue]{get_current_datetime()} {msg_type.upper()}][/blue] {text}\n[yellow]{"#" * len(text)}[/yellow]\n'
+	)
+
+
+def print_step(msg_type: str, text: str):
+	print(
+		f'[yellow]{"=" * 16}[/yellow] [blue][{get_current_datetime()} {msg_type.upper()}][/blue] {text}'
+	)
+
+
+def print_substep(msg_type: str, text: str):
+	print(
+		f'[cyan]{"=" * 8}[/cyan]\n[blue][{get_current_datetime()} {msg_type.upper()}][/blue] {text}'
+	)
+
+
+def print_message(msg_type: str, text: str):
+	print(f"[blue][{get_current_datetime()} {msg_type.upper()}][/blue] {text}")
 
 
 class CommandManager:
@@ -25,8 +52,9 @@ class CommandManager:
 		:raises		RuntimeError:  command failed
 		"""
 
-		print(
-			f"[italic] Execute command: [/italic]: [white on black]{command}[/white on black]"
+		print_message(
+			"info",
+			f"[italic] Execute command: [/italic]: [white on black]{command}[/white on black]",
 		)
 
 		result = subprocess.run(
@@ -51,7 +79,7 @@ class CommandManager:
 		:type		path:  str
 		"""
 		os.chdir(path)
-		print(f"[bold]Directory changed: {path}[/bold]")
+		print_message("CHANGE DIRECTORY", f"[bold]Directory changed: {path}[/bold]")
 
 
 def validate_project_name(project_name: str):
@@ -77,29 +105,3 @@ def create_directory(path: Path):
 	:type		path:  Path
 	"""
 	Path(path).mkdir(parents=True, exist_ok=True)
-
-
-def execute_commands(commands: list):
-	"""
-	Execute commands
-
-	:param		commands:	   The commands
-	:type		commands:	   list
-
-	:raises		RuntimeError:  command failed
-	"""
-	for command in commands:
-		print(
-			f"[italic] Execute command: [/italic]: [white on black]{command}[/white on black]"
-		)
-		result = subprocess.run(
-			shlex.split(command), stdout=subprocess.PIPE, stderr=subprocess.PIPE
-		)
-		if result.returncode != 0:
-			raise RuntimeError(
-				f'Command "{command}" failed with exit code {result.returncode}:\n{result.stderr.decode()}'
-			)
-		else:
-			print(
-				f'[green bold]Successfully run[/green bold] "{command}":\n{result.stdout.decode()}'
-			)

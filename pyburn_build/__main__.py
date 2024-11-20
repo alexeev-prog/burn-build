@@ -1,3 +1,4 @@
+from threading import Thread
 import click
 from rich.console import Console
 from rich.prompt import Prompt, Confirm
@@ -137,7 +138,39 @@ def build(targets: str, project_config: str, toolchain_config: str):
 
 	targets = "all" if targets == "all" else targets.split(",")
 
-	bm.build(targets)
+	thread = Thread(target=bm.build, args=(targets,))
+	thread.start()
+	thread.join()
+
+
+@cli.command()
+@click.option(
+	"--targets", help="Targets for build (default: all)", required=True, default="all"
+)
+@click.option("--project-configs", help="Paths to project config", required=True)
+@click.option("--toolchain-configs", help="Paths to toolchain config", required=True)
+def multi_build(targets, project_configs, toolchain_configs):
+	targets = "all" if targets == "all" else targets.split(",")
+	project_configs = project_configs.split(",")
+	toolchain_configs = toolchain_configs.split(",")
+
+	if len(project_configs) != len(toolchain_configs):
+		raise ValueError("Check the number of configurations matches")
+	else:
+		for i in range(len(project_configs)):
+			project_config_type = config_type_by_file(project_configs[i].strip())
+			toolchain_config_type = config_type_by_file(toolchain_configs[i].strip())
+
+			pc = ProjectConfigReader(project_configs[i].strip(), project_config_type)
+			tc = ToolchainConfigReader(
+				toolchain_configs[i].strip(), toolchain_config_type
+			)
+
+			bm = BuildManager(pc.config, tc.config)
+
+			thread = Thread(target=bm.build, args=(targets,))
+			thread.start()
+			thread.join()
 
 
 @cli.command()

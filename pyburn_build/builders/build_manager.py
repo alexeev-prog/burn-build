@@ -1,4 +1,5 @@
 from typing import Union
+from multiprocessing import Process, Pool, cpu_count
 from rich import print
 from pyburn_build.config.project_config import ProjectConfig
 from pyburn_build.config.toolchain_config import ToolchainConfig
@@ -10,7 +11,13 @@ from pyburn_build.builders.builders import (
 	BaseBuilder,
 )
 from pyburn_build.templates import TEMPLATES
-from pyburn_build.utils import CommandManager
+from pyburn_build.utils import (
+	CommandManager,
+	print_header,
+	print_step,
+	print_substep,
+	print_message,
+)
 from pyburn_build.exceptions import SourcesIsUptodate
 
 
@@ -64,6 +71,78 @@ class BuildManager:
 
 		self.supported_compilers = ["gcc", "g++", "clang", "clang++"]
 
+	def _build_target(self, target):
+		print_header(f"TARGET {target.name}", f"Start Build Target: {target.name}")
+
+		compiler = (
+			target.compiler if target.compiler is not None else self.default_compiler
+		)
+
+		if compiler.lower() not in self.supported_compilers:
+			print_message(
+				f"TARGET {target.name}",
+				"[yellow bold]Compiler not supported, using CustomBuilder...[/yellow bold]",
+			)
+
+		try:
+			builder = get_builder(self.project_config, compiler, target)
+		except SourcesIsUptodate as ex:
+			print_message(
+				f"TARGET {target.name}",
+				f"[yellow bold]Skip target {target.name}: all sources is up to date ({ex})[/yellow bold]\n",
+			)
+			return
+
+		print_step(f"BUILD TARGET {target.name}", f"RUN BUILD {target.name}")
+
+		if self.project_config.USE_CMAKE:
+			print_substep("note", "[blue] Use CMake Builder[/blue]")
+			print_message(
+				"warning", "[yellow bold]Support only C++ projects[/yellow bold]"
+			)
+
+			with open("cmake_build.sh", "w") as file:
+				file.write(TEMPLATES["build.sh"])
+
+			p = Process(
+				target=CommandManager.run_command, args=("bash cmake_build.sh",)
+			)
+			p.start()
+			p.join()
+		else:
+			print_substep(f"TARGET {target.name}", "[blue] Use Built-in Builder[/blue]")
+
+			builder.run()
+
+		print_step(f"TARGET {target.name} END BUILD", f"END BUILD {target.name}")
+
+	def _run_build_process(self, targets: Union[list, str]):
+		if targets == "all":
+			print_message(
+				"debug",
+				f"Create pool with processes: {cpu_count()} (for run build process). Targets: {targets}",
+			)
+			with Pool(processes=cpu_count()) as pool:
+				targets = self.toolchain_config.targets
+				pool.map(self._build_target, targets)
+		else:
+			_targets = []
+			for t in self.toolchain_config.targets:
+				if t in targets:
+					self._targets.append(t)
+				else:
+					print_message(
+						f"TARGET {t.name}", f"[bold]Skip target: {t.name}[/bold]\n"
+					)
+
+			print_message(
+				"debug",
+				f"Create pool with processes: {cpu_count()} (for run build process). Targets: {targets}",
+			)
+			with Pool(processes=cpu_count()) as pool:
+				targets = _targets
+				pool.map(self._build_target, targets)
+
 	def build(self, targets: Union[list, str]):
 		"""
 		Build project
@@ -71,72 +150,37 @@ class BuildManager:
 		:param		targets:  The targets
 		:type		targets:  Union[list, str]
 		"""
-		print("[bold]CONFIGURATION[/bold]")
-		print(f"[underline]Project config[/underline]:\n{self.project_config}\n")
-		print(f"[underline]Toolchain config[/underline]:\n{self.toolchain_config}\n")
-
-		print(f'[green]{"=" * 16} Start build (targets: {targets})[/green]\n')
-
-		print(
-			f'[cyan]{"=" * 4} Execute prelude commands: {self.toolchain_config.prelude_commands}[/cyan]'
+		print_header(
+			"TARGETS BUILD", f"[green]Start build (targets: {targets})[/green]"
 		)
 
-		for command in self.toolchain_config.prelude_commands:
-			CommandManager.run_command(command)
+		print_step(
+			"TOOLCHAIN",
+			f"Execute prelude commands: {self.toolchain_config.prelude_commands}",
+		)
+
+		print_message(
+			"debug",
+			f"Create pool with processes: {cpu_count()} (for run prelude commands)",
+		)
+		with Pool(processes=cpu_count()) as pool:
+			pool.map(CommandManager.run_command, self.toolchain_config.prelude_commands)
 
 		print()
 
-		for target in self.toolchain_config.targets:
-			if targets == "all" or target in targets:
-				print(
-					f'[bold cyan]{"=" * 8} Start Build Target: {target.name} {"=" * 8}[/bold cyan]'
-				)
-				print(f"{target}\n")
+		# process = Process(target=self._run_build_process, args=(targets,))
+		# process.start()
+		# process.join()
+		print_step("RUN BUILD PROCESS", f"Run build process for targets: {targets}")
+		self._run_build_process(targets)
 
-				compiler = (
-					target.compiler
-					if target.compiler is not None
-					else self.default_compiler
-				)
-
-				if compiler.lower() not in self.supported_compilers:
-					print(
-						"[yellow bold]Compiler not supported, using CustomBuilder...[/yellow bold]"
-					)
-
-				try:
-					builder = get_builder(self.project_config, compiler, target)
-				except SourcesIsUptodate as ex:
-					print(
-						f"[yellow bold]Skip target {target.name}: all sources is up to date ({ex})[/yellow bold]\n"
-					)
-					continue
-
-				print(f'[blue]{"=" * 4} RUN BUILD {"=" * 4}[/blue]')
-
-				if self.project_config.USE_CMAKE:
-					print("[blue] Use CMake Builder[/blue]")
-					print("[yellow bold]Support only C++ projects[/yellow bold]")
-
-					with open("cmake_build.sh", "w") as file:
-						file.write(TEMPLATES["build.sh"])
-
-					CommandManager.run_command("bash cmake_build.sh")
-				else:
-					print("[blue] Use Built-in Builder[/blue]")
-
-					builder.run()
-
-				print(f'[blue]{"=" * 4} END BUILD {"=" * 4}[/blue]')
-
-				print(
-					f'[bold cyan]{"=" * 8}\nEnd Build Target {target.name} {"=" * 8}[/bold cyan]\n'
-				)
-			else:
-				print(f"[bold]Skip target: {target.name}[/bold]\n")
-
-		print(
-			f'[cyan]{"=" * 4} Execute post commands: {self.toolchain_config.post_commands}[/cyan]'
+		print_step(
+			"TOOLCHAIN", f"Execute post commands: {self.toolchain_config.post_commands}"
 		)
-		for command in self.toolchain_config.post_commands:
-			CommandManager.run_command(command)
+
+		print_message(
+			"debug",
+			f"Create pool with processes: {cpu_count()} (for run post commands)",
+		)
+		with Pool(processes=cpu_count()) as pool:
+			pool.map(CommandManager.run_command, self.toolchain_config.post_commands)
