@@ -5,6 +5,7 @@ description = "build system written in python for projects in C, C++, Python, AS
 language = "python"
 use_cmake = true
 cache_file = "cache.json"
+features = ["pyechonext"]
 
 [compiler]
 name = "gcc"

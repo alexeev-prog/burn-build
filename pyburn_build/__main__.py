@@ -7,7 +7,7 @@ from pyburn_build.config.project_config import ProjectConfigReader
 from pyburn_build.config.toolchain_config import ToolchainConfigReader
 from pyburn_build.creator import ProjectArchitecture
 from pyburn_build.builders.build_manager import BuildManager
-from pyburn_build.utils import CommandManager
+from pyburn_build.utils import CommandManager, print_message
 from pyburn_build.config.configsaver import write_file
 from pyburn_build.exceptions import UnknownTargetError
 
@@ -174,21 +174,39 @@ def multi_build(targets, project_configs, toolchain_configs):
 
 
 @cli.command()
+@click.option("--project-config", help="Path to project config", required=True)
 @click.option("--toolchain-config", help="Path to toolchain config", required=True)
 @click.option("--target", help="Target name", required=True)
-def run(toolchain_config: str, target: str):
+@click.option(
+	"--feature-pyechonext-appname",
+	help="Application name for feature pyechonext",
+	default="echonext",
+)
+def run(
+	project_config: str,
+	toolchain_config: str,
+	target: str,
+	feature_pyechonext_appname: str,
+):
 	"""
 	Run builded target
 
-	:param		project_config:	   The project configuration
-	:type		project_config:	   str
-	:param		toolchain_config:  The toolchain configuration
-	:type		toolchain_config:  str
+	:param		project_config:				 The project configuration
+	:type		project_config:				 str
+	:param		toolchain_config:			 The toolchain configuration
+	:type		toolchain_config:			 str
+	:param		target:						 The target
+	:type		target:						 str
+	:param		feature_pyechonext_appname:	 The feature pyechonext appname
+	:type		feature_pyechonext_appname:	 str
 
-	:raises		ValueError:		   Unknown target
+	:raises		UnknownTargetError:			 Unknown target
+	:raises		ValueError:	 Unknown target
 	"""
+	project_config_type = config_type_by_file(project_config)
 	toolchain_config_type = config_type_by_file(toolchain_config)
 
+	pc = ProjectConfigReader(project_config, project_config_type)
 	tc = ToolchainConfigReader(toolchain_config, toolchain_config_type)
 
 	for t in tc.config.targets:
@@ -199,7 +217,11 @@ def run(toolchain_config: str, target: str):
 	if isinstance(target, str):
 		raise UnknownTargetError(f"Unknown target: {target}")
 
-	CommandManager.run_command(f"./{target.output}")
+	if "pyechonext" in pc.config.FEATURES:
+		print_message("run", 'Enable feature: "pyechonext"')
+		CommandManager.run_command(f"gunicorn app.py:{feature_pyechonext_appname}")
+	else:
+		CommandManager.run_command(f"./{target.output}")
 
 
 def main():

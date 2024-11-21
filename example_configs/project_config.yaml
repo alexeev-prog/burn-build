@@ -5,6 +5,8 @@ metadata:
     language: python
     use_cmake: true
     cache_file: cache.json
+    features:
+        - pyechonext
 
 compiler:
     name: gcc

@@ -44,7 +44,8 @@ Create project_config.json:
         "description": "Hello World app",
         "language": "cpp",
         "use_cmake": false,
-        "cache_file": "cache.json"
+        "cache_file": "cache.json",
+        "features": ["pyechonext"]
     },
 
     "compiler": {
@@ -91,3 +92,42 @@ And build project:
 ```bash
 python3 -m pyburn_build build --project-config example_configs/project_config.json --toolchain-config example_configs/toolchain_config.json
 ```
+
+## Specification
+
+### Project
+Basic project information 
+
+#### Metadata
+Meta information and other general characteristics of the project.
+
+ + name - project name
+ + version - project version
+ + description - short project description
+ + language - main project language
+ + use_cmake - use cmake flag (experimental)
+ + cache_file - path to cache json file
+ + features - list of enabled features (supported: pyechonext)
+
+#### Compiler
+Information about the compiler, basic flags.
+
+ + name - main compiler name
+ + base_compiler_flags - list of compiler flags
+
+### Toolchain
+Setting up tools, build chain, commands.
+
+ + prelude_commands - Commands to execute before build
+ + post_commands - Commands to execute after build
+ + targets - dict with targets
+
+#### Targets
+Targets list
+
+ + compiler_options - additional compiler flags
+ + sources - list with sources for target
+ + output - output filename
+ + includes - include-files (C/C++)
+ + objects - .o files
+ + compiler - compiler command

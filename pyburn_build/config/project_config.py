@@ -14,6 +14,7 @@ class ProjectConfig:
 	DESCRIPTION: str
 	LANGUAGE: str = "DEFAULT"
 	CACHE_FILE: str = "build_cache.json"
+	FEATURES: list = field(default_factory=list)
 
 	COMPILER_NAME: str = None
 	BASE_COMPILER_FLAGS: list = field(default_factory=list)
@@ -67,6 +68,7 @@ class ProjectConfigReader(ConfigReader):
 			DESCRIPTION=metadata.get("description", "my application"),
 			LANGUAGE=metadata.get("language", "DEFAULT"),
 			USE_CMAKE=metadata.get("use_cmake", False),
+			FEATURES=metadata.get("features", []),
 			COMPILER_NAME=compiler.get("name", None),
 			BASE_COMPILER_FLAGS=compiler.get("base_compiler_flags", []),
 			CACHE_FILE=metadata.get("cache_file", "build_cache.json"),

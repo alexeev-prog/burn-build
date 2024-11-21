@@ -5,7 +5,8 @@
 		"description": "Hello World app",
 		"language": "cpp",
 		"use_cmake": false,
-		"cache_file": "cache.json"
+		"cache_file": "cache.json",
+		"features": ["pyechonext"]
 	},
 
 	"compiler": {

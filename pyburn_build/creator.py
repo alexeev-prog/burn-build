@@ -1,10 +1,10 @@
 import os
 from pathlib import Path
-from rich import print
 from pyburn_build.config.project_config import ProjectConfig
 from pyburn_build.config.toolchain_config import ToolchainConfig
 from pyburn_build.templates import TEMPLATES
-from pyburn_build.utils import create_directory
+from pyburn_build.utils import create_directory, print_header, print_message
+import pyburn_build.features.templates as feature_templates
 
 
 class ProjectArchitecture:
@@ -65,6 +65,9 @@ class ProjectArchitecture:
 		for file in files:
 			file = os.path.join(self.base_dir, file)
 			directory = os.path.dirname(file)
+			print_message(
+				"creator", f"Create dirs with file: directory={directory}\tfile={file}"
+			)
 			os.makedirs(directory, exist_ok=True)
 
 			if not os.path.exists(file):
@@ -85,7 +88,7 @@ class ProjectArchitecture:
 		Creates files.
 		"""
 		for file in self.files:
-			print(f"[bold cyan][CREATOR][/bold cyan] Create file: {file}")
+			print_message("CREATOR", f"Create file: {file}")
 			with open(os.path.join(self.base_dir, file), "w") as f:
 				f.write(
 					TEMPLATES.get(file, file)
@@ -94,33 +97,54 @@ class ProjectArchitecture:
 				)
 
 		for file in self.added_files:
-			print(f"[bold cyan][CREATOR][/bold cyan] Create file: {file}")
+			print_message("CREATOR", f"Create file: {file}")
 			with open(file, "r") as src:
 				file = file.split("/")[-1]
 				with open(os.path.join(self.base_dir, file), "w") as dist:
 					dist.write(src.read())
 
+		if "pyechonext" in self.project_config.FEATURES:
+			print_message("creator", 'Enable feature: "pyechonext"')
+
+			print_message("CREATOR", f"Create file: {self.base_dir}/app.py")
+			with open(os.path.join(self.base_dir, "app.py"), "w") as file:
+				file.write(feature_templates.MAIN_APP_TEMPLATE)
+
+			for project_dir, files in feature_templates.DIRS.items():
+				directory = os.path.join(self.base_dir, project_dir)
+				print_message("CREATOR", f"Create directory: {directory}")
+				os.makedirs(directory, exist_ok=True)
+
+				for filename, content in files.items():
+					print_message(
+						"CREATOR", f"Create file: {os.path.join(directory, filename)}"
+					)
+					with open(os.path.join(directory, filename), "w") as file:
+						file.write(content)
+
+		print_message("creator", "End create files")
+
 	def _create_dirs(self):
 		"""
 		Creates dirs.
 		"""
-		print(f"[bold cyan][CREATOR][/bold cyan] Create directory: {self.base_dir}")
+		print_message("creator", f"Create directory: {self.base_dir}")
 		create_directory(self.base_dir)
-		print(f"[bold cyan][CREATOR][/bold cyan] Create directory: {self.docs_dir}")
+		print_message("creator", f"Create directory: {self.docs_dir}")
 		create_directory(self.docs_dir)
 
 		for extra_dir in self.extra_dirs:
-			print(f"[bold cyan][CREATOR][/bold cyan] Create directory: {extra_dir}")
+			print_message("creator", f"Create directory: {extra_dir}")
 			create_directory(extra_dir)
 
 	def run(self):
 		"""
 		Run project creation
 		"""
-		print(f'[bold green][CREATOR][/bold green] {"=" * 16} Run Project Creation')
+		print_header("creator", "[green]Run Project Creation[/green]")
 
 		self._create_dirs()
 
 		self._create_files()
 
-		print(f'[bold green][CREATOR][/bold green] {"=" * 16} End Project Creation')
+		print_header("creator", "[green]End Project Creation[/green]")
