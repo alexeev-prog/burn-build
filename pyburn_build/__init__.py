@@ -4,7 +4,7 @@ import requests
 
 install(show_locals=True)
 
-__version__ = "0.3.6"
+__version__ = "0.3.7"
 
 
 def check_for_update():

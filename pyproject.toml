@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyburn-build"
-version = "0.3.6"
+version = "0.3.7"
 description = "build system written in python for projects in C and C++"
 authors = ["alexeev-prog <alexeev.dev@mail.ru>"]
 license = "GNU LGPL v2.1"

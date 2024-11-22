@@ -1,6 +1,6 @@
 from rich import print
 from pyburn_build.config.toolchain_config import TargetData
-from pyburn_build.utils import CommandManager
+from pyburn_build.utils import CommandManager, print_message
 from pyburn_build.config.project_config import ProjectConfig
 from pyburn_build.cache import BuildCache
 from pyburn_build.exceptions import SourcesIsUptodate
@@ -59,7 +59,13 @@ class BaseBuilder:
 		if self.sources is None:
 			raise SourcesIsUptodate("Error: no sources ready for build")
 
-		self.command = f"{self.compiler_name} {self.flags} {self.includes} {self.sources} -o {self.target.output}".strip()
+		if len(self.target.output) < 1:
+			print_message("warning", "no output target")
+			output = ""
+		else:
+			output = f"-o {self.target.output}"
+
+		self.command = f"{self.compiler_name} {self.flags} {self.includes} {self.sources} {output}".strip()
 
 	def run(self):
 		"""

@@ -1,3 +1,9 @@
+commit 2d05d09cea9ad3729a21f5f105021237dd82813c
+Author: alexeev-prog <alexeev.dev@mail.ru>
+Date:   Thu Nov 21 20:09:20 2024 +0700
+
+    feat/docs: improve creator, add features, improve docs
+
 commit 91678668bbb211fe33bccb4012ed69aa6297ce0c
 Author: alexeev-prog <alexeev.dev@mail.ru>
 Date:   Wed Nov 20 18:55:13 2024 +0700

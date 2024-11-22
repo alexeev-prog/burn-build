@@ -8,28 +8,66 @@ from rich import print
 
 
 def get_current_datetime() -> str:
+	"""
+	Gets the current datetime.
+
+	:returns:	The current datetime.
+	:rtype:		str
+	"""
 	return datetime.now().strftime("%H:%M:%S")
 
 
 def print_header(msg_type: str, text: str):
+	"""
+	Prints a header.
+
+	:param		msg_type:  The message type
+	:type		msg_type:  str
+	:param		text:	   The text
+	:type		text:	   str
+	"""
 	print(
 		f'[yellow]{"#" * len(text)}[/yellow]\n[blue]{get_current_datetime()} {msg_type.upper()}][/blue] {text}\n[yellow]{"#" * len(text)}[/yellow]\n'
 	)
 
 
 def print_step(msg_type: str, text: str):
+	"""
+	Prints a step.
+
+	:param		msg_type:  The message type
+	:type		msg_type:  str
+	:param		text:	   The text
+	:type		text:	   str
+	"""
 	print(
 		f'[yellow]{"=" * 16}[/yellow] [blue][{get_current_datetime()} {msg_type.upper()}][/blue] {text}'
 	)
 
 
 def print_substep(msg_type: str, text: str):
+	"""
+	Prints a substep.
+
+	:param		msg_type:  The message type
+	:type		msg_type:  str
+	:param		text:	   The text
+	:type		text:	   str
+	"""
 	print(
 		f'[cyan]{"=" * 8}[/cyan]\n[blue][{get_current_datetime()} {msg_type.upper()}][/blue] {text}'
 	)
 
 
 def print_message(msg_type: str, text: str):
+	"""
+	Prints a message.
+
+	:param		msg_type:  The message type
+	:type		msg_type:  str
+	:param		text:	   The text
+	:type		text:	   str
+	"""
 	print(f"[blue][{get_current_datetime()} {msg_type.upper()}][/blue] {text}")
 
 
